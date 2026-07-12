@@ -1,5 +1,6 @@
 package com.syncvault.syncvault_backend;
 
+import com.syncvault.SyncvaultBackendApplication;
 import org.springframework.boot.SpringApplication;
 
 public class TestSyncvaultBackendApplication {
