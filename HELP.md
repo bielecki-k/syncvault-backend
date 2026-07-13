@@ -2,6 +2,11 @@
 run docker desktop
 run SVapp
 
+curl http://localhost:8080/actuator/health
+curl post http://localhost:8080/api/workspace?name=chui na pewno dziaa post?
+
+
+
 
 # Read Me First
 The following was discovered as part of building this project:
