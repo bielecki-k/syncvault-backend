@@ -18,7 +18,7 @@ public class Workspace {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
     private String name;
-    private String status; //todo enum
+    private String status; //todo @Enumerated
     private LocalDateTime registration_datetime;
 
 }
