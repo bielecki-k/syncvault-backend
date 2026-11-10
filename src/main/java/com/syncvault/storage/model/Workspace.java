@@ -1,11 +1,13 @@
 package com.syncvault.storage.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name="workspace")
+@Builder
 public class Workspace {
 
     @Id
