@@ -15,6 +15,6 @@ public class Workspace {
     private Long id;
     private String name;
     private String status; //todo enum
-    private LocalDateTime connection_start;
+    private LocalDateTime registration_datetime;
 
 }
