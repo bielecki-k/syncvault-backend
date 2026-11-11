@@ -1,4 +1,4 @@
-package com.syncvault.syncvault_backend;
+package com.syncvault;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
