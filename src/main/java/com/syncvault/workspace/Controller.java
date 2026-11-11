@@ -19,7 +19,7 @@ public class Controller {
         workspaceService.saveWorkspace();
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Posted", "true");
-        return new ResponseEntity<String>("Workspace Posted", responseHeaders, HttpStatus.CREATED);
+        return new ResponseEntity<>("Workspace Posted", responseHeaders, HttpStatus.CREATED);
     }
 
 }
