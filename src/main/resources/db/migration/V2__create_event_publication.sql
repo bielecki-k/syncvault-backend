@@ -8,3 +8,12 @@ CREATE TABLE event_publication
     completion_date  TIMESTAMP WITH TIME ZONE,
     PRIMARY KEY (id)
 );
+
+CREATE TABLE workspace
+(
+    id               BIGINT    NOT NULL,
+    connection_start TIMESTAMP NOT NULL,
+    name             TEXT      NOT NULL,
+    status           TEXT      NOT NULL,
+    PRIMARY KEY (id)
+);
