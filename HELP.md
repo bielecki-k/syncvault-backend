@@ -1,5 +1,6 @@
 # First run
-run docker desktop
+run docker 
+run compose
 run SVapp
 
 curl http://localhost:8080/actuator/health
