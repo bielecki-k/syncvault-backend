@@ -4,7 +4,7 @@ run compose
 run SVapp
 
 curl http://localhost:8080/actuator/health
-curl post http://localhost:8080/api/workspace?name=chui na pewno dziaa post?
+curl post http://localhost:8080/api/workspace na pewno dziaa post?
 
 
 
