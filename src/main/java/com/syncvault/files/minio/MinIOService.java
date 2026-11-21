@@ -1,12 +1,10 @@
 package com.syncvault.files.minio;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,11 +18,12 @@ public class MinIOService {
 
     private final String BUCKET_1 = "filebucket1";
 
-    public void saveFile(MultipartFile file){
+    @Transactional
+    public ObjectWriteResponse saveFile(MultipartFile file){
         checkBucket();
-
+        ObjectWriteResponse objectWriteResponse = null;
         try {
-            minioClient.putObject(PutObjectArgs
+            objectWriteResponse = minioClient.putObject(PutObjectArgs
                     .builder()
                     .bucket(BUCKET_1)
                     .object("file")
@@ -33,6 +32,7 @@ public class MinIOService {
         } catch (MinioException | GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
+        return objectWriteResponse;
     }
 
     private void checkBucket() {
