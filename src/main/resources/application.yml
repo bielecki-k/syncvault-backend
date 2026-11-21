@@ -16,6 +16,10 @@ spring:
   flyway:
     enabled: false #hibernate:ddl-auto:[false/validate] when flyway:enabled:true
     baselineOnMigrate: false
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 110MB
 
 server:
   port: 8080
