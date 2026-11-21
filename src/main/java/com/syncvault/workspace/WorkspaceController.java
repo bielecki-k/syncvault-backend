@@ -37,9 +37,10 @@ public class WorkspaceController {
             value = "/api/workspace/{workspace_id}/file",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> postFile(@PathVariable("workspace_id") Long workspaceId,
-                                           @RequestParam("file") MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-
-        minioService.saveFile();
+                                           @RequestParam("file") MultipartFile file)
+    {
+        //todo workspace ID check
+        minioService.saveFile(file);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("file_id", "!fill_me!");
         return new ResponseEntity<>("File Posted", responseHeaders, HttpStatus.CREATED);
