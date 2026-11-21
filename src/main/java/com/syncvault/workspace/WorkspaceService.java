@@ -14,13 +14,17 @@ public class WorkspaceService {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
-    public Optional<Workspace> saveWorkspace(){
+    public void saveWorkspace(){
         Workspace operatingWorkspace = Workspace.builder()
                 .status("running")
                 .name("win11-dev")
                 .registration_datetime(LocalDateTime.now())
                 .build();
-        return Optional.of(workspaceRepository.save(operatingWorkspace));
+        workspaceRepository.save(operatingWorkspace);
+    }
+
+    public Boolean checkWorkspaceExists(Long workspaceId){
+        return workspaceRepository.findById(workspaceId).isPresent();
     }
 
 }
