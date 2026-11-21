@@ -10,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
+@Slf4j
 @RestController
 //@RequestMapping("/api/workspace")
 public class WorkspaceController {
@@ -26,10 +23,12 @@ public class WorkspaceController {
 
     @PostMapping("/api/workspace")
     public ResponseEntity<String> postWorkspace(){
-
+        log.info("postWorkspace()");
         workspaceService.saveWorkspace();
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Posted", "true");
+
+        log.info("Workspace posted successfully");
         return new ResponseEntity<>("Workspace Posted", responseHeaders, HttpStatus.CREATED);
     }
 
