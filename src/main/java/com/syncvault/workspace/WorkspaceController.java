@@ -1,7 +1,9 @@
 package com.syncvault.workspace;
 
 import com.syncvault.files.minio.MinIOService;
+import io.minio.ObjectWriteResponse;
 import io.minio.errors.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,11 +40,26 @@ public class WorkspaceController {
     public ResponseEntity<String> postFile(@PathVariable("workspace_id") Long workspaceId,
                                            @RequestParam("file") MultipartFile file)
     {
-        //todo workspace ID check
-        minioService.saveFile(file);
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("file_id", "!fill_me!");
-        return new ResponseEntity<>("File Posted", responseHeaders, HttpStatus.CREATED);
+        log.debug("postFile()");
+        Boolean wsExists = workspaceService.checkWorkspaceExists(workspaceId);
+        if (wsExists) {
+            log.info("workspace {} exists",workspaceId);
+            ObjectWriteResponse objectWriteResponse = minioService.saveFile(file);
+
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("file_posted", "true");
+            responseHeaders.set("file_etag", objectWriteResponse.etag());
+            log.info("File saved successfully");
+            return new ResponseEntity<>("FILE_NOT_POSTED", responseHeaders, HttpStatus.CREATED);
+
+        } else {
+            log.info("workspace {} doesn't exists! ",workspaceId);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("file_posted", "false");
+            return new ResponseEntity<>("FILE_NOT_POSTED!", responseHeaders, HttpStatus.BAD_REQUEST);
+        }
+
+
     }
 
 
