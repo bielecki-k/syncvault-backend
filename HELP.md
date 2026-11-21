@@ -3,8 +3,19 @@ run docker
 run compose
 run SVapp
 
+MinIO:
+http://localhost:9001/browser/filebucket1
+
+# API examples:
 curl http://localhost:8080/actuator/health
-curl post http://localhost:8080/api/workspace na pewno dziaa post?
+
+curl --request POST \
+--url http://localhost:8080/api/workspace
+
+curl --request POST \
+--url http://localhost:8080/api/workspace/111/file \
+--header 'Content-Type: multipart/form-data' \
+--form 'file=@/home/keru/Desktop/drukareczka 3D/Beran+Skull.3mf'
 
 
 
