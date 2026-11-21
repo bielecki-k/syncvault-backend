@@ -1,8 +1,8 @@
 package com.syncvault.workspace;
 
 import com.syncvault.files.minio.MinIOService;
+import com.syncvault.storage.model.Workspace;
 import io.minio.ObjectWriteResponse;
-import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -41,16 +43,18 @@ public class WorkspaceController {
                                            @RequestParam("file") MultipartFile file)
     {
         log.debug("postFile()");
-        Boolean wsExists = workspaceService.checkWorkspaceExists(workspaceId);
-        if (wsExists) {
+        Optional<Workspace> workspace = workspaceService.getWorkspace(workspaceId);
+        if (workspace.isPresent()) {
             log.info("workspace {} exists",workspaceId);
-            ObjectWriteResponse objectWriteResponse = minioService.saveFile(file);
+
+            ObjectWriteResponse objectWriteResponse = minioService.saveFile(file);  //minIO
+            workspaceService.saveFileMetadata(workspace.get(),objectWriteResponse);     //postgreSQL
 
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("file_posted", "true");
             responseHeaders.set("file_etag", objectWriteResponse.etag());
             log.info("File saved successfully");
-            return new ResponseEntity<>("FILE_NOT_POSTED", responseHeaders, HttpStatus.CREATED);
+            return new ResponseEntity<>("FILE_POSTED", responseHeaders, HttpStatus.CREATED);
 
         } else {
             log.info("workspace {} doesn't exists! ",workspaceId);
