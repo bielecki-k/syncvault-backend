@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name="workspace")
@@ -15,10 +16,13 @@ import java.time.LocalDateTime;
 public class Workspace {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long workspace_id;
     private String name;
     private String status; //todo @Enumerated
     private LocalDateTime registration_datetime;
+
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
+    private List<StoredFile> file;
 
 }
