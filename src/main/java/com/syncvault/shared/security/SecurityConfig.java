@@ -16,10 +16,15 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/workspace").permitAll()
+                        .requestMatchers("/api/files").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/workspace/{workspace_id}/file"
+                        ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/files/{objectKey}/content"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
