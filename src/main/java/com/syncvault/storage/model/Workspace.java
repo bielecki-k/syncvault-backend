@@ -16,7 +16,8 @@ import java.util.List;
 public class Workspace {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    @Column(name = "workspace_id")
     private Long workspace_id;
     private String name;
     private String status; //todo @Enumerated
