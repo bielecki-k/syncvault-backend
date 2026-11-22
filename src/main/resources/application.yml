@@ -4,6 +4,7 @@ management:
     web:
       expousure:
         include: health
+
 spring:
   datasource:
     url: jdbc:postgresql://postgres:5432/sv_database

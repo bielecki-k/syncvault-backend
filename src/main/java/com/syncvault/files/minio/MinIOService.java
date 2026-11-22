@@ -2,14 +2,17 @@ package com.syncvault.files.minio;
 
 import io.minio.*;
 import io.minio.errors.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 
+@Slf4j
 @Service
 public class MinIOService {
 
@@ -18,7 +21,16 @@ public class MinIOService {
 
     private final String BUCKET_1 = "filebucket1";
 
-    @Transactional
+    public InputStream getFile(String objectKey) throws Exception {
+        log.info("Getting object key {}", objectKey);
+        return minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(BUCKET_1)
+                            .object(objectKey)
+                            .build());
+    }
+
+    @Transactional //todo potrzebuje tego?
     public ObjectWriteResponse saveFile(MultipartFile file){
         checkBucket();
         ObjectWriteResponse objectWriteResponse = null;
