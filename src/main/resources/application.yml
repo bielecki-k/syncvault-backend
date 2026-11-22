@@ -13,9 +13,6 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
-  flyway:
-    enabled: false #hibernate:ddl-auto:[false/validate] when flyway:enabled:true
-    baselineOnMigrate: false
   servlet:
     multipart:
       max-file-size: 100MB
