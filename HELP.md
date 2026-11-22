@@ -1,5 +1,5 @@
-# First run
-run docker 
+# Getting Started / First run
+run docker
 run compose
 run SVapp
 
@@ -7,7 +7,11 @@ MinIO:
 http://localhost:9001/browser/filebucket1
 
 # API examples:
-curl http://localhost:8080/actuator/health
+curl --request GET \
+--url http://localhost:8080/actuator/health
+
+curl --request GET \
+--url http://localhost:8080/api/files/file/content
 
 curl --request POST \
 --url http://localhost:8080/api/workspace
@@ -20,9 +24,9 @@ curl -v -X POST -F "file=@//tmp/some.file" http://localhost:8080/api/workspace/6
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.syncvault.syncvault-backend' is invalid and this project uses 'com.syncvault.syncvault_backend' instead.
+* fill_me
 
-# Getting Started
+
 
 ### Reference Documentation
 For further reference, please consider the following sections:
