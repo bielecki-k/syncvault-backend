@@ -1,18 +1,21 @@
 package com.syncvault.workspace;
 
 import com.syncvault.files.minio.MinIOService;
+import com.syncvault.storage.SaveFileResponse;
 import com.syncvault.storage.model.StoredFile;
 import com.syncvault.storage.model.Workspace;
 import com.syncvault.storage.repository.StoredFileRepository;
 import com.syncvault.storage.repository.WorkspaceRepository;
 import io.minio.ObjectWriteResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -28,21 +31,21 @@ public class WorkspaceService {
     private StoredFileRepository storedFileRepository;
 
 
-    public void saveFileAndMetadata(Workspace workspace,MultipartFile file){
-        ObjectWriteResponse objectWriteResponse = minioService.saveFile(file);  //minIO
-        saveMetadata(workspace,objectWriteResponse);                            //postgreSQL
+    public SaveFileResponse saveFileAndMetadata(Workspace workspace, MultipartFile file){
+        ObjectWriteResponse objectWriteResponse = minioService.saveFile(file);                  //minIO
+        UUID file_id = saveMetadata(workspace, objectWriteResponse, file.getOriginalFilename());//postgreSQL
+        return new SaveFileResponse(objectWriteResponse,file_id);
     }
 
 
-    private void saveMetadata(Workspace workspace, ObjectWriteResponse objectWriteResponse){
-
-        log.info("saveMetadata objectKey: {}",objectWriteResponse.object());
+    private UUID saveMetadata(Workspace workspace, ObjectWriteResponse objectWriteResponse, @Nullable String originalFilename){
         StoredFile storedFile = StoredFile.builder().workspace(workspace)
-                .originalFileName(objectWriteResponse.object())
+                .objectKey(objectWriteResponse.object())
+                .originalFileName(originalFilename)
                 .objectETag(objectWriteResponse.etag())
                 .createdAt(LocalDateTime.now())
                 .build();
-        storedFileRepository.save(storedFile);
+        return storedFileRepository.save(storedFile).getStored_file_id();
     }
 
     public Workspace saveWorkspace(){
