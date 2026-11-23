@@ -1,6 +1,7 @@
 package com.syncvault.workspace;
 
 import com.syncvault.files.minio.MinIOService;
+import com.syncvault.storage.SaveFileResponse;
 import com.syncvault.storage.model.Workspace;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -24,6 +24,9 @@ public class WorkspaceController {
 
     @Autowired
     private MinIOService minioService;
+
+    public record FileResponse(String id, String name) {}
+    public record WorkspaceResponse(Long id) {}
 
     @GetMapping("/api/files/{objectKey}/content")
     public ResponseEntity<StreamingResponseBody> getFile(@PathVariable("objectKey") String objectKey) {
@@ -51,37 +54,30 @@ public class WorkspaceController {
     }
 
     @PostMapping("/api/workspace")
-    public ResponseEntity<String> postWorkspace(){
-        workspaceService.saveWorkspace();
+    public ResponseEntity<WorkspaceResponse> postWorkspace(){
+        Workspace workspace = workspaceService.saveWorkspace();
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Posted", "true");
         log.info("Workspace posted successfully");
-        return new ResponseEntity<>("Workspace Posted", responseHeaders, HttpStatus.CREATED);
+        return ResponseEntity.ok(new WorkspaceResponse(workspace.getWorkspace_id()));
     }
 
     @PostMapping(
             value = "/api/workspace/{workspace_id}/file",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> postFile(@PathVariable("workspace_id") Long workspaceId,
-                                           @RequestParam("file") MultipartFile file)
+    public ResponseEntity<FileResponse> postFile(@PathVariable("workspace_id") Long workspaceId,
+                                                 @RequestParam("file") MultipartFile file)
     {
-        log.debug("postFile()");
-        Optional<Workspace> workspace = workspaceService.getWorkspace(workspaceId);
-        if (workspace.isPresent()) {
+        if (workspaceService.getWorkspace(workspaceId).isPresent()) {
             log.info("workspace {} exists",workspaceId);
-            workspaceService.saveFileAndMetadata(workspace.get(),file);
 
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("file_posted", "true");
-//            responseHeaders.set("file_etag", objectWriteResponse.etag()); //todo zwrocic id
+            SaveFileResponse saveFileResponse = workspaceService
+                    .saveFileAndMetadata(workspaceService.getWorkspace(workspaceId).get(), file);
+
             log.info("File saved successfully");
-            return new ResponseEntity<>("FILE_POSTED", responseHeaders, HttpStatus.CREATED);
+            return ResponseEntity.ok(new FileResponse(saveFileResponse.file_id().toString(),file.getOriginalFilename()));
         } else {
             log.info("workspace {} doesn't exists! ",workspaceId);
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("file_posted", "false");
-            return new ResponseEntity<>("FILE_NOT_POSTED!", responseHeaders, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.notFound().build();
         }
     }
 }
