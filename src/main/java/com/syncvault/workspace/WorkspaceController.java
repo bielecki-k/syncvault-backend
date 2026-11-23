@@ -57,7 +57,7 @@ public class WorkspaceController {
     public ResponseEntity<WorkspaceResponse> postWorkspace(){
         Workspace workspace = workspaceService.saveWorkspace();
 
-        log.info("Workspace posted successfully");
+        log.info("Workspace {} posted successfully", workspace.getWorkspace_id());
         return ResponseEntity.ok(new WorkspaceResponse(workspace.getWorkspace_id()));
     }
 
@@ -73,7 +73,7 @@ public class WorkspaceController {
             SaveFileResponse saveFileResponse = workspaceService
                     .saveFileAndMetadata(workspaceService.getWorkspace(workspaceId).get(), file);
 
-            log.info("File saved successfully");
+            log.info("File {} saved successfully",file.getOriginalFilename());
             return ResponseEntity.ok(new FileResponse(saveFileResponse.file_id().toString(),file.getOriginalFilename()));
         } else {
             log.info("workspace {} doesn't exists! ",workspaceId);
