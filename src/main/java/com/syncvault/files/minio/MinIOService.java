@@ -31,7 +31,7 @@ public class MinIOService {
 
     public ObjectWriteResponse saveFile(MultipartFile file){
         checkBucket();
-        ObjectWriteResponse objectWriteResponse = null;
+        ObjectWriteResponse objectWriteResponse;
         try {
             objectWriteResponse = minioClient.putObject(PutObjectArgs
                     .builder()
@@ -46,7 +46,7 @@ public class MinIOService {
     }
 
     private void checkBucket() {
-        boolean bucketExists = false;
+        boolean bucketExists;
         try {
             bucketExists = minioClient
                     .bucketExists(BucketExistsArgs.builder()
