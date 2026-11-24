@@ -1,6 +1,5 @@
 package com.syncvault.workspace;
 
-import com.syncvault.files.minio.MinIOService;
 import com.syncvault.storage.SaveFileResponse;
 import com.syncvault.storage.model.Workspace;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -22,35 +20,24 @@ public class WorkspaceController {
     @Autowired
     private WorkspaceService workspaceService;
 
-    @Autowired
-    private MinIOService minioService;
-
     public record FileResponse(String id, String name) {}
     public record WorkspaceResponse(Long id) {}
 
-    @GetMapping("/api/files/{objectKey}/content")
-    public ResponseEntity<StreamingResponseBody> getFile(@PathVariable("objectKey") String objectKey) {
-        log.info("Getting file for object {}", objectKey);
-        StreamingResponseBody stream = outputStream -> {
-            try (InputStream inputStream =
-                         minioService.getFile(objectKey)) {
+    @GetMapping("/api/files/{file_id}/content")
+    public ResponseEntity<StreamingResponseBody> getFile(@PathVariable("file_id") UUID file_id) {
+        log.info("Getting file_id: {}", file_id);
 
-                inputStream.transferTo(outputStream);
-            } catch (Exception e) {
-                throw new IOException("Failed to download file", e);
-            }
-        };
+        Optional<StreamingResponseBody> fileFromMinIO = workspaceService.getFileFromMinIO(file_id);
 
-        return ResponseEntity.ok()
+        return fileFromMinIO.map(streamingResponseBody -> ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.attachment()
-                                .filename(objectKey, StandardCharsets.UTF_8)
+//                                    .filename(objectKey, StandardCharsets.UTF_8)
                                 .build()
                                 .toString()
-                )
-                .body(stream);
+                ).body(streamingResponseBody)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/api/workspace")
@@ -68,8 +55,6 @@ public class WorkspaceController {
                                                  @RequestParam("file") MultipartFile file)
     {
         if (workspaceService.getWorkspace(workspaceId).isPresent()) {
-            log.info("workspace {} exists",workspaceId);
-
             SaveFileResponse saveFileResponse = workspaceService
                     .saveFileAndMetadata(workspaceService.getWorkspace(workspaceId).get(), file);
 
