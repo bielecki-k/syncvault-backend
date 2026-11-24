@@ -12,7 +12,10 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +38,26 @@ public class WorkspaceService {
         ObjectWriteResponse objectWriteResponse = minioService.saveFile(file);                  //minIO
         UUID file_id = saveMetadata(workspace, objectWriteResponse, file.getOriginalFilename());//postgreSQL
         return new SaveFileResponse(objectWriteResponse,file_id);
+    }
+
+    public Optional<StreamingResponseBody> getFileFromMinIO(UUID file_id) {
+
+        Optional<StoredFile> optionalStoredFile = storedFileRepository.findById(file_id);
+        if(optionalStoredFile.isPresent()){
+
+            StreamingResponseBody stream = outputStream -> {
+                try (InputStream inputStream =
+                             minioService.getFile(optionalStoredFile.get().getObjectKey())) {
+
+                    inputStream.transferTo(outputStream);
+                } catch (Exception e) {
+                    throw new IOException("Failed to download file", e);
+                }
+            };
+
+            return Optional.of(stream);
+        } else { return Optional.empty();}
+
     }
 
 
