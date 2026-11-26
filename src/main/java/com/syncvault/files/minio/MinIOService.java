@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -36,7 +37,7 @@ public class MinIOService {
             objectWriteResponse = minioClient.putObject(PutObjectArgs
                     .builder()
                     .bucket(BUCKET_1)
-                    .object("file")
+                    .object(UUID.randomUUID().toString())
                     .stream(file.getInputStream(), file.getSize(), file.getSize())
                     .build());
         } catch (MinioException | GeneralSecurityException | IOException e) {
