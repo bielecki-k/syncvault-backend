@@ -1,7 +1,7 @@
 # Getting Started / First run
 run docker
-run compose
-run SVapp
+run compose.yaml
+run SyncvaultBackendApplication
 
 MinIO:
 http://localhost:9001/browser/filebucket1
@@ -16,7 +16,10 @@ curl --request GET \
 curl --request POST \
 --url http://localhost:8080/api/workspace
 
-curl -v -X POST -F "file=@//tmp/some.file" http://localhost:8080/api/workspace/602/file
+curl --request POST \
+--url http://localhost:8080/api/workspace/111/file \
+--header 'Content-Type: multipart/form-data' \
+--form 'file=@/dir/file.ext'
 
 
 
