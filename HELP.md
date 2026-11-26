@@ -12,10 +12,7 @@ curl http://localhost:8080/actuator/health
 curl --request POST \
 --url http://localhost:8080/api/workspace
 
-curl --request POST \
---url http://localhost:8080/api/workspace/111/file \
---header 'Content-Type: multipart/form-data' \
---form 'file=@/home/keru/Desktop/drukareczka 3D/Beran+Skull.3mf'
+curl -v -X POST -F "file=@//tmp/some.file" http://localhost:8080/api/workspace/602/file
 
 
 
